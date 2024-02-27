@@ -3,7 +3,7 @@ title: "Navigating the Pitfalls of Data Cleaning: Avoiding Incorrect Conclusions
 subtitle: "Understanding the Impact of Mistakes on Research Outcomes"
 author: 
   - Chenhang Huang
-thanks: "Code and data are available at: LINK."
+thanks: "Code and data are available at: https://github.com/chenhanghuang/miniessay7"
 date: today
 date-format: long
 abstract: "This study investigates the impact of systematic biases introduced during the data cleaning process on research outcomes. We simulate common mistakes such as memory issues, data entry errors, and decimal shifts to assess their effects. The results highlight significant differences between the original and cleaned data, emphasizing the importance of thorough data validation procedures. Addressing these biases is crucial for ensuring the reliability and validity of research conclusions."
