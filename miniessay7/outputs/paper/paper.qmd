@@ -1,0 +1,122 @@
+---
+title: "Navigating the Pitfalls of Data Cleaning: Avoiding Incorrect Conclusions"
+subtitle: "Understanding the Impact of Mistakes on Research Outcomes"
+author: 
+  - Chenhang Huang
+thanks: "Code and data are available at: LINK."
+date: today
+date-format: long
+abstract: "This study investigates the impact of systematic biases introduced during the data cleaning process on research outcomes. We simulate common mistakes such as memory issues, data entry errors, and decimal shifts to assess their effects. The results highlight significant differences between the original and cleaned data, emphasizing the importance of thorough data validation procedures. Addressing these biases is crucial for ensuring the reliability and validity of research conclusions."
+format: pdf
+number-sections: true
+bibliography: references.bib
+---
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+
+```
+
+
+# Introduction
+
+
+After we get the original data, we have to clean and prepare it to make the final dataset. But sometimes mistakes happen during this process, causing problems called systematic biases. These biases can mess up our analysis and lead to wrong conclusions that we can't fix later. They can happen in different ways, like getting too much data or making mistakes with symbols or decimals. This study looks at how these mistakes affect the data and our conclusions, by simulating them. We want to learn more about how these mistakes can affect our research and why it's important to be careful when cleaning data.
+
+The remainder of this paper is structured as follows. in @sec-data, we present the simulation of the data processing procedure.Then, @sec-res compares the difference between original data and the cleaned data. @sec-dis summarize the findings and discuss the consequences of errors in data cleaning.
+
+
+
+# Data {#sec-data}
+
+In this section, I'll begin by sampling 1000 units from a normal distribution with mean 0 and standard deviation 1 to represent the true values. Next, I'll simulate three mistakes in the data cleaning process using the method described in [@citeR]. These mistakes include: 1) the instrument has a memory issue causing the last 100 observations to be a repetition of the first 100; 2) accidentally changing half of the negative values to positive during data cleaning; 3) accidentally shifting the decimal place for values between 1 and 1.1. After cleaning, I'll compare the true data with the cleaned data to highlight any differences.
+
+
+
+```{r}
+#| label: tbl-table1
+#| tbl-cap: Summarize of the original and new data
+#| echo: false
+
+set.seed(1)
+x = rnorm(1000)
+
+# 1
+
+x[901:1000] = x[1:100]
+
+# 2
+
+nx = x[x<0]
+nx[1:round(length(nx)/2)] = -nx[1:round(length(nx)/2)]
+
+px = x[x>=0]
+newx = c(px,nx)
+
+df = tibble(x=x,newx= newx)
+knitr::kable(summary(df))
+```
+# Results {#sec-res}
+
+Our results are summarized in @tbl-table1 using the package knitr by @Knitr. While the mean and median of the original data are close to 0, those of the new data are 0.42 and 0.39 respectively, indicating notable differences between the two datasets. I also show their distributions in @fig-fig1 by using @ggplot. It can be seen that the original value is near normal distribution, but the new data shape is not bell shape. In the new data, most of the values are within 0 and 1. I also run the hypothesis test for the new dataset, the null hypothesis is :
+
+$$H_0: \mu =0$$
+$$H_1:\mu >0$$
+the t statistic is 12.88, which is higher than 2, so we reject the null hypothesis. For the original data, the t-statistic is only -0.036, near zero, and we fail to reject the null hypothesis.
+
+
+```{r}
+#| label: fig-fig1
+#| fig-cap:  Distribution of original and new data
+#| echo: false
+#| warning: false
+#| message: false
+
+
+p1<-df %>% ggplot(aes(x=x)) + 
+  geom_histogram(aes(y = ..density..), binwidth = 0.1) +
+  geom_density() +
+  labs(y = "Density",
+       x = "original value")  
+  
+p2<-df %>% ggplot(aes(x=newx)) + 
+  geom_histogram(aes(y = ..density..), binwidth = 0.1) +
+  geom_density() +
+  labs(y = "Density",
+       x = "new value")  
+
+
+grid.arrange(p1,p2, nrow = 2)
+
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| include: false
+
+
+t.test(df$newx,alternative = "greater")
+
+t.test(df$x,alternative = "greater")
+```
+
+
+# Discussion {#sec-dis}
+
+Through the above analysis, we find that errors introduced during data processing can lead to significant discrepancies between the processed and original data. The biases introduced in the simulation are primarily due to errors in instrument measurement and data entry. This outcome serves as a reminder that it's crucial to check the accuracy of data during processing and conduct effective data testing to avoid the generation of such systematic errors.
+
+
+\newpage
+
+
+# References
+
+
